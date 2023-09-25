@@ -43,3 +43,64 @@ exports.signup = async (req, res) => {
 }
 
 
+//login
+
+exports.login = async (req , res) =>{
+   try{
+      const {email , password}=req.body;
+      //validation
+      if(!email || !password){
+         return res.status(400).json({
+            success:false,
+            message:"data in not appropriate , Fill the information carefully"
+         })
+      }
+      let user = await User.findOne({email});
+      if(!user){
+         return res.status(401).json({
+            success:false,
+             message:"User name was not found "
+         })}
+         const payload = {
+            email:user.email,
+            id:user._id,
+            role:user.role
+         }
+         if(await bcrypt.compare(password , user.password)){
+               let token = jwt.sign(payload ,process.env.JWT_SECRET , {
+                  expiresIn:"2h"
+               })
+               console.log(user);
+               user = user.toObject();
+               user.token = token;
+               console.log(user);
+               user.password = undefined;
+               console.log(user);
+               const options = {
+                     expires:new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                     httpOnly:true,
+               }
+               res.cookie("nkcookie", token , options).status(200).json({
+                  success:true,
+                  token,
+                  user,
+                  message:'User Logged in successfully'
+               })
+         }
+         else{
+            return res.status(401).json({
+               success:false,
+               message:"the password is not valid "
+            })
+            
+         }
+   }
+   catch(error){
+         console.log(error)
+         return res.status(400).json({
+            success:false,
+            message:'login failure bro'
+         })
+   }
+
+}

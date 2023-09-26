@@ -4,9 +4,10 @@ const jwt = require("jsonwebtoken")
 
 exports.auth = (req , res , next)=>{
     try{
-         const token = req.body.token;
+        console.log(req.cookies.token)
+         const token =  req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer " , "")
       
-         if(!token){
+         if(!token || token === undefined){
             return res.status(401).json({
                 success:false,
                 message:'Token is Missing bro'
@@ -19,7 +20,7 @@ exports.auth = (req , res , next)=>{
          }catch(error){
             return res.status(401).json({
                 success:false,
-                message:'token in invalid bro'
+                message:'token is invalid bro'
             })  
          }
       next();
@@ -29,6 +30,7 @@ exports.auth = (req , res , next)=>{
             success:false,
             message:"something wents wrong while excessing the token bro"
           })
+         
     }
 }
 

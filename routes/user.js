@@ -3,6 +3,7 @@ const router = express.Router();
 const {isAdmin , isStudent , auth } = require("../middleware/auth")
 const {login , signup}= require("../Controller/Auth");
 
+
 router.post("/login", login);
 router.post("/signup" , signup);
 

@@ -3,6 +3,7 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 require("dotenv").config(); 
 
+
 exports.signup = async (req, res) => {
     try{
          const {name , email , password , role}= req.body;
@@ -24,13 +25,13 @@ exports.signup = async (req, res) => {
                 message:'error in hashing password bro'
             })
          }
-         const user = await User.create({
+         let user = await User.create({
             name , email , password:hashedPassword, role
          })
          return res.status(200).json({
             success:true,
-            message:"user created successfullyy bro"
-
+            message:"user created successfullyy bro",
+           data:user
          })
     }
     catch(error){
@@ -78,14 +79,14 @@ exports.login = async (req , res) =>{
                console.log(user);
                const options = {
                      expires:new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-                     httpOnly:true,
+                     httpOnly:true
                }
-               res.cookie("nkcookie", token , options).status(200).json({
-                  success:true,
+              res.cookie("token",token,options).status(200).json({
+                  success : true,
                   token,
                   user,
-                  message:'User Logged in successfully'
-               })
+                  message:"User logged in successfully"
+              });
          }
          else{
             return res.status(401).json({
